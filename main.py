@@ -33,7 +33,7 @@ class newConnection:
             print(f"{tableName} table exists")
             return True
         elif re == False:
-            print(f"{tableName} table exists")
+            print(f"{tableName} table does not exists")
             return False
         else: sys.exit()
 class newTable(newConnection):
@@ -99,15 +99,10 @@ class createRequest:
     def __init__(self,BASE_URL,BASE_HEADER):
         self.url = BASE_URL
         self.headers = BASE_HEADER
-        # print(self.headers)
 
     def getlogintoken(self,EMAIL,PASSWORD):
-        # EMAIL = config['INFO']['EMAIL']
-        # PASSWORD = config['INFO']['PASSWORD']
         url = self.url+"/api/auth/sign-in"
         payload = {"email":EMAIL,"password":PASSWORD}
-        # tmpObj = {'api-token': 'lkjsad'}
-        # self.headers.update(tmpObj)
         r = requests.post(url,headers=self.headers,json=payload)
         data_parsed =  r.json()
         if r.status_code == requests.codes.ok :
@@ -116,9 +111,7 @@ class createRequest:
             print("token get")
             self.token = TOKEN
             tmpObj = {'api-token': TOKEN}
-            # self.headers=self.headers.update(tmpObj)
             self.headers.update(tmpObj)
-            # return TOKEN
         else:
             errorMessage()
 
@@ -128,17 +121,15 @@ class createRequest:
         data_parsed =  r.json()
         if (r.status_code == requests.codes.ok) and (data_parsed['ok'] == True):
             print(data_parsed)
-            # print(TOKEN)
         else:
             errorMessage()
     def getCourses(self):
         url = self.url +"/api/account/courses"
-        # print(self.headers)
         r = requests.get(url,headers=self.headers)
         data_parsed = r.json()
         if r.status_code == requests.codes.ok:
             arrayOfCourse = data_parsed['data']
-            print(arrayOfCourse)
+            # print(arrayOfCourse)
             return arrayOfCourse
         else:
             errorMessage()
@@ -148,7 +139,7 @@ class createRequest:
         data_parsed = r.json()
         if r.status_code == requests.codes.ok:
             arrayOfLesson = data_parsed['data']
-            print(arrayOfLesson)
+            # print(arrayOfLesson)
             return arrayOfLesson
         else:
             errorMessage()
@@ -159,7 +150,7 @@ class createRequest:
         data_parsed = r.json()
         if r.status_code == requests.codes.ok:
             arrayOfExams = data_parsed
-            print(arrayOfExams)
+            # print(arrayOfExams)
             return arrayOfExams
         else:
             errorMessage()
@@ -169,21 +160,17 @@ def CoursesToDB(connectionObj,requestObj,arrayOfCourse,tableName):
     valueType = f"({valueName[0]} VARCHAR(10) PRIMARY KEY, {valueName[1]} VARCHAR(50))"
 
     if connectionObj.checkTableExist(tableName)==True:
-        print(f"{tableName} (table) exist")
-        tableOfListCourse = newTable(tableName,connectionObj,valueType)#valueType TODO
+        tableOfListCourse = newTable(tableName,connectionObj,valueType)
     else :
-        # connectionObj.createTable(tableName,valueType)
-        tableOfListCourse = newTable(tableName,connectionObj,valueType)#valueType TODO
+        tableOfListCourse = newTable(tableName,connectionObj,valueType)
         tableOfListCourse.createTable()
     for obj in arrayOfCourse:
         courseName = obj["name"]
         courseIdentify = obj["identify"]
         values = [courseIdentify,courseName]
-        if tableOfListCourse.checkRowExist(valueName[0],courseIdentify)==True:
-            print(f"{courseName} (column) exist")
-        else:
+        if tableOfListCourse.checkRowExist(valueName[0],courseIdentify)==False:
             tableOfListCourse.insertTwoValues(values,valueName)
-            # TODO
+            sendNotify(f"新課程〈{courseName}〉發布了！")
         arrayOfLesson=requestObj.getLessons(courseIdentify) #COURSEID
         LessonToDB(connectionObj,requestObj,arrayOfLesson,tableName,courseIdentify)
 def LessonToDB(connectionObj,requestObj,arrayOfLesson,parentTableName,courseIdentify):
@@ -192,7 +179,6 @@ def LessonToDB(connectionObj,requestObj,arrayOfLesson,parentTableName,courseIden
     valueType = f"({valueName[0]} VARCHAR(10) PRIMARY KEY, {valueName[1]} VARCHAR(50), {valueName[2]} VARCHAR(10) REFERENCES \"{parentTableName}\" (courseindentify))"
 
     if connectionObj.checkTableExist(tableName)==True:
-        print(f"{tableName} exist")
         tableOfListLesson = newTable(tableName,connectionObj,valueType)
     else:
         tableOfListLesson = newTable(tableName,connectionObj,valueType)
@@ -201,24 +187,20 @@ def LessonToDB(connectionObj,requestObj,arrayOfLesson,parentTableName,courseIden
         lessonName = obj["name"]
         lessonIdentify = obj["identify"]
         values = [lessonIdentify,lessonName,courseIdentify]
-        if tableOfListLesson.checkRowExist(valueName[0],lessonIdentify)==True:
-            print(f"{lessonName} (row) exist")
-        
-        else:
+        if tableOfListLesson.checkRowExist(valueName[0],lessonIdentify)==False:
             tableOfListLesson.insertThreeValues(values,valueName)
+            sendNotify(f"新題庫〈{lessonName}〉發布了！")
         arrayOfExams = requestObj.getExams(lessonIdentify)
         ValuesToDB(connectionObj,arrayOfExams,tableName,lessonIdentify)
 def ValuesToDB(connectionObj,arrayOfExams,parentTableName,lessonIdentify):
     tableName = lessonIdentify
     valueName = ['examindentify','name','difficulty','passers','participants','published_date','published_time','parentlesson']
-    # (indentify VARCHAR(10) PRIMARY KEY, name VARCHAR(50), difficulty INTEGER,passers INTEGER,participants INTEGER ,published_date DATE, published_time TIME)
     valueType = f"({valueName[0]} VARCHAR(10) PRIMARY KEY, {valueName[1]} VARCHAR(50), {valueName[2]} INTEGER, {valueName[3]} INTEGER, {valueName[4]} INTEGER, {valueName[5]} DATE, {valueName[6]} TIME, {valueName[7]} VARCHAR(10) REFERENCES \"{parentTableName}\" (lessonindentify))"
 
     if connectionObj.checkTableExist(tableName)==True:
-        print(f"{tableName} exist")
-        tableOfListExams = newTable(tableName,connectionObj,valueType)#
+        tableOfListExams = newTable(tableName,connectionObj,valueType)
     else:
-        tableOfListExams = newTable(tableName,connectionObj,valueType)#
+        tableOfListExams = newTable(tableName,connectionObj,valueType)
         tableOfListExams.createTable()
     for obj in arrayOfExams:
         examIdentify  = obj["identify"]
@@ -229,20 +211,21 @@ def ValuesToDB(connectionObj,arrayOfExams,parentTableName,lessonIdentify):
         published_at = obj["published_at"]
 
         dtobj = datetime.datetime.strptime(published_at,'%Y-%m-%d %H:%M:%S')
-        # values = ["testid","testname",12,44,11,dtobj.date(),dtobj.time()]
         values = [examIdentify,examName,difficulty,passers,participants,dtobj.date(),dtobj.time(),lessonIdentify]
 
-        if tableOfListExams.checkRowExist(valueName[0],examIdentify)==True:
-            print(f"{examName} (column) exist")
-        else:
+        if tableOfListExams.checkRowExist(valueName[0],examIdentify)==False:
             tableOfListExams.insertEightValues(values,valueName)
-def sendRequest(payload):
-    url = "http://flaskapp/"
-    headers = {'accept':'application/json'}
-    r =  requests.post(url,headers,json=payload)
-    # data_parsed = r.json()
+            sendNotify(f"新題目〈{examName}〉發布了！\n發布於<{published_at}>")
+def sendNotify(message):
+    LINE_TOKEN = os.environ.get("LINE_TOKEN")
+    headers = {
+            "Authorization": "Bearer " + str(LINE_TOKEN),
+            "Content-Type": "application/x-www-form-urlencoded"
+    }
+    params = {"message": message}
+    r = requests.post("https://notify-api.line.me/api/notify",headers=headers, params=params)
     if r.status_code == requests.codes.ok:
-        print("data sended")
+        print("Message sented")
     else:
         errorMessage()
 #------------------
@@ -262,7 +245,6 @@ BASE_HEADER = {'accept':'application/json','origin':'https://ccu.juice.codes', '
 load_dotenv()
 EMAIL = os.environ.get("EMAIL")
 PASSWORD = os.environ.get("PASSWORD")
-LINE_TOKEN = os.environ.get("LINE_TOKEN")
 connectToJuice = createRequest(BASE_URL,BASE_HEADER)
 connectToJuice.getlogintoken(EMAIL,PASSWORD)
 arrayOfCourse=connectToJuice.getCourses()
