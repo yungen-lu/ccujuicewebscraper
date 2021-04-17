@@ -229,6 +229,7 @@ def sendNotify(message):
     else:
         errorMessage()
 #------------------
+load_dotenv()
 host = "postgresdb" #docker service name
 dbname = os.environ.get("POSTGRES_DB")
 user = os.environ.get("POSTGRES_USER")
@@ -242,12 +243,11 @@ ua = UserAgent()
 
 BASE_URL = 'https://ccu.juice.codes'
 BASE_HEADER = {'accept':'application/json','origin':'https://ccu.juice.codes', 'content-type':'application/json','user-agent':ua.random}
-load_dotenv()
 EMAIL = os.environ.get("EMAIL")
 PASSWORD = os.environ.get("PASSWORD")
 connectToJuice = createRequest(BASE_URL,BASE_HEADER)
 connectToJuice.getlogintoken(EMAIL,PASSWORD)
 arrayOfCourse=connectToJuice.getCourses()
-CoursesToDB(connectToDB,connectToJuice,arrayOfCourse,"testest")
+CoursesToDB(connectToDB,connectToJuice,arrayOfCourse,"masterTable")
 connectToJuice.logout()
 connectToDB.closeConnection()
