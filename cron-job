@@ -1,1 +1,1 @@
-*/30 * * * * docker run --name juice juiceimage
+*/30 * * * * docker run --name ccujuicewebscrape python3 -m /app/main.py >> ~/juice.log

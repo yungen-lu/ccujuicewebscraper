@@ -1,5 +1,10 @@
 version: '3.7'
 services:
+  ccujuicewebscrape:
+    container_name: ccujuicewebscrape
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
   postgresdb:
     container_name: postgresdb
     image: postgres:alpine
