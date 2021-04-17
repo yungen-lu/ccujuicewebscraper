@@ -1,4 +1,7 @@
 version: '3.7'
+networks:
+  internal:
+    external: false
 services:
   ccujuicewebscrape:
     container_name: ccujuicewebscrape
@@ -6,6 +9,8 @@ services:
       context: "./"
       dockerfile: "Dockerfile"
     image: ccujuicewebscrape:latest
+    networks:
+      - internal
   postgresdb:
     container_name: postgresdb
     image: postgres:alpine
@@ -16,5 +21,7 @@ services:
     restart: always
     volumes:
       - db_data:/var/lib/postgresql/data
+      networks:
+        - internal
 volumes:
   db_data:

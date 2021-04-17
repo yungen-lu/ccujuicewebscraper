@@ -1,1 +1,1 @@
-*/30 * * * * docker run ccujuicewebscrape:latest python3 -m /app/main.py >> ~/juice.log
+*/30 * * * * docker run ccujuicewebscrape:latest python3  /app/main.py >> ~/juice.log
