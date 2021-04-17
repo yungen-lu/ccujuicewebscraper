@@ -4,9 +4,10 @@ import os
 import requests
 import datetime
 from dotenv import load_dotenv
+from fake_useragent import UserAgent
+
 class newConnection:
     def __init__(self,conn_string):
-        # self.url = url
         self.conn_string = conn_string
     # def createConnection(self):
         try:
@@ -71,18 +72,6 @@ class newTable(newConnection):
             return False
         else: sys.exit()
 
-    # def insertExamsValues(self,values):
-    #     try:
-    #         self.cursor.execute(f"INSERT INTO {self.tableName} {self.valueType} VALUES (%s, %s, %s, %s, %s, %s, %s);", (values[0],values[1],values[2],values[3],values[4],values[5],values[6]))
-    #         print(f"{values} inserted")
-    #     except (Exception, psycopg2.DatabaseError) as error:
-    #         print(error)
-    # def insertValues(self,values):
-    #     try:
-    #         self.cursor.execute(f"INSERT INTO {self.tableName} {self.valueType} VALUES (%s, %s);", (values[0],values[1]))
-    #         print(f"{values} inserted")
-    #     except (Exception, psycopg2.DatabaseError) as error:
-    #         print(error)
     def insertTwoValues(self,values,valueName):
         try:
             self.cursor.execute(f"INSERT INTO \"{self.tableName}\" ({valueName[0]}, {valueName[1]}) VALUES (%s, %s);", (values[0],values[1]))
@@ -106,30 +95,6 @@ class newTable(newConnection):
 def errorMessage():
     print("ERROR",file=sys.stderr)
     sys.exit("-1")
-# def getlogintoken(BASE_HEADER,BASE_URL,EMAIL,PASSWORD):
-#     # EMAIL = config['INFO']['EMAIL']
-#     # PASSWORD = config['INFO']['PASSWORD']
-#     url = BASE_URL+"api/auth/sign-in"
-#     payload = {"email":EMAIL,"password":PASSWORD}
-#     r = requests.post(url,headers=BASE_HEADER,json=payload)
-#     data_parsed =  r.json()
-#     if r.status_code == requests.codes.ok:
-#         print(data_parsed)
-#         TOKEN=data_parsed['data']['token']
-#         # print(TOKEN)
-#         return TOKEN
-#     else:
-#         errorMessage()
-# 
-# def logout(EXTEND_HEADER,BASE_URL):
-#     url = BASE_URL+"api/auth/sign-out"
-#     r = requests.post(url,headers=EXTEND_HEADER)
-#     data_parsed =  r.json()
-#     if (r.status_code == requests.codes.ok) and (data_parsed['ok'] == True):
-#         print(data_parsed)
-#         # print(TOKEN)
-#     else:
-#         errorMessage()
 class createRequest:
     def __init__(self,BASE_URL,BASE_HEADER):
         self.url = BASE_URL
@@ -271,25 +236,24 @@ def ValuesToDB(connectionObj,arrayOfExams,parentTableName,lessonIdentify):
             print(f"{examName} (column) exist")
         else:
             tableOfListExams.insertEightValues(values,valueName)
-# def sendRequest():
-
-# class sendRequest(createRequest):
-#     def __init__(self,parentObj, exetend_url):
-#         self.url = parentObj.url
-#         self.eurl = parentObj.url + exetend_url
-#         self.headers 
-#     def get(self):
-#         r = requests.get(self.eurl,header=self.)
+def sendRequest(payload):
+    url = "http://flaskapp/"
+    headers = {'accept':'application/json'}
+    r =  requests.post(url,headers,json=payload)
+    # data_parsed = r.json()
+    if r.status_code == requests.codes.ok:
+        print("data sended")
+    else:
+        errorMessage()
 #------------------
-host = "127.0.0.1"
-dbname = "postgres"
-user = "yungen"
-password = os.environ.get("PASSWORD")
+host = "postgresdb" #docker service name
+dbname = os.environ.get("POSTGRES_DB")
+user = os.environ.get("POSTGRES_USER")
+password = os.environ.get("POSTGRES_PASSWORD")
 sslmode = 'allow'
 conn_string = "host={0} user={1} dbname={2} password={3} sslmode={4}".format(host, user, dbname, password, sslmode)
 
-testConnect = newConnection(conn_string)
-from fake_useragent import UserAgent
+connectToDB = newConnection(conn_string)
 
 ua = UserAgent()
 
@@ -298,9 +262,10 @@ BASE_HEADER = {'accept':'application/json','origin':'https://ccu.juice.codes', '
 load_dotenv()
 EMAIL = os.environ.get("EMAIL")
 PASSWORD = os.environ.get("PASSWORD")
-testJ = createRequest(BASE_URL,BASE_HEADER)
-testJ.getlogintoken(EMAIL,PASSWORD)
-arrayOfCourse=testJ.getCourses()
-CoursesToDB(testConnect,testJ,arrayOfCourse,"testest")
-testJ.logout()
-testConnect.closeConnection()
+LINE_TOKEN = os.environ.get("LINE_TOKEN")
+connectToJuice = createRequest(BASE_URL,BASE_HEADER)
+connectToJuice.getlogintoken(EMAIL,PASSWORD)
+arrayOfCourse=connectToJuice.getCourses()
+CoursesToDB(connectToDB,connectToJuice,arrayOfCourse,"testest")
+connectToJuice.logout()
+connectToDB.closeConnection()
