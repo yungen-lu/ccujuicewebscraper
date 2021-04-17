@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  ccujuicewebscrape:
+    container_name: ccujuicewebscrape
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    environment:
+      - POSTGRES_USER=ccujuice
+      - POSTGRES_PASSWORD=ccujuice
+      - POSTGRES_DB=ccujuice
+    # restart: always
+  postgresdb:
+    container_name: postgresdb
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=ccujuice
+      - POSTGRES_PASSWORD=ccujuice
+      - POSTGRES_DB=ccujuice
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+volumes:
+  db_data:
