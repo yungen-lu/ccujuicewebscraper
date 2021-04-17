@@ -21,7 +21,7 @@ services:
     restart: always
     volumes:
       - db_data:/var/lib/postgresql/data
-      networks:
-        - internal
+    networks:
+      - internal
 volumes:
   db_data:
