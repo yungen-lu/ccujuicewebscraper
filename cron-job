@@ -1,0 +1,1 @@
+*/30 * * * * docker run --name juice juiceimage
