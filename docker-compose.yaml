@@ -1,21 +1,5 @@
 version: '3.7'
-networks:
-  internal:
-    external: false
 services:
-  ccujuicewebscrape:
-    container_name: ccujuicewebscrape
-    build:
-      context: "./"
-      dockerfile: "Dockerfile"
-    environment:
-      - POSTGRES_USER=ccujuice
-      - POSTGRES_PASSWORD=ccujuice
-      - POSTGRES_DB=ccujuice
-    depends_on:
-      - postgresdb    # restart: always
-    networks:
-      - internal
   postgresdb:
     container_name: postgresdb
     image: postgres:alpine
@@ -26,7 +10,5 @@ services:
     restart: always
     volumes:
       - db_data:/var/lib/postgresql/data
-    networks:
-      - internal
 volumes:
   db_data:
