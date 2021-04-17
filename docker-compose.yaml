@@ -5,6 +5,7 @@ services:
     build:
       context: "./"
       dockerfile: "Dockerfile"
+    image: ccujuicewebscrape:latest
   postgresdb:
     container_name: postgresdb
     image: postgres:alpine
