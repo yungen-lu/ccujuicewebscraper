@@ -170,7 +170,7 @@ def CoursesToDB(connectionObj,requestObj,arrayOfCourse,tableName):
         values = [courseIdentify,courseName]
         if tableOfListCourse.checkRowExist(valueName[0],courseIdentify)==False:
             tableOfListCourse.insertTwoValues(values,valueName)
-            sendNotify(f"新課程〈{courseName}〉發布了！")
+            sendNotify(f"\n新課程〈{courseName}〉發布了！")
         arrayOfLesson=requestObj.getLessons(courseIdentify) #COURSEID
         LessonToDB(connectionObj,requestObj,arrayOfLesson,tableName,courseIdentify)
 def LessonToDB(connectionObj,requestObj,arrayOfLesson,parentTableName,courseIdentify):
@@ -189,10 +189,10 @@ def LessonToDB(connectionObj,requestObj,arrayOfLesson,parentTableName,courseIden
         values = [lessonIdentify,lessonName,courseIdentify]
         if tableOfListLesson.checkRowExist(valueName[0],lessonIdentify)==False:
             tableOfListLesson.insertThreeValues(values,valueName)
-            sendNotify(f"新題庫〈{lessonName}〉發布了！")
+            sendNotify(f"\n新題庫〈{lessonName}〉發布了！")
         arrayOfExams = requestObj.getExams(lessonIdentify)
-        ValuesToDB(connectionObj,arrayOfExams,tableName,lessonIdentify)
-def ValuesToDB(connectionObj,arrayOfExams,parentTableName,lessonIdentify):
+        ValuesToDB(connectionObj,arrayOfExams,tableName,lessonIdentify,lessonName)
+def ValuesToDB(connectionObj,arrayOfExams,parentTableName,lessonIdentify,lessonName):
     tableName = lessonIdentify
     valueName = ['examindentify','name','difficulty','passers','participants','published_date','published_time','parentlesson']
     valueType = f"({valueName[0]} VARCHAR(10) PRIMARY KEY, {valueName[1]} VARCHAR(50), {valueName[2]} INTEGER, {valueName[3]} INTEGER, {valueName[4]} INTEGER, {valueName[5]} DATE, {valueName[6]} TIME, {valueName[7]} VARCHAR(10) REFERENCES \"{parentTableName}\" (lessonindentify))"
@@ -215,7 +215,7 @@ def ValuesToDB(connectionObj,arrayOfExams,parentTableName,lessonIdentify):
 
         if tableOfListExams.checkRowExist(valueName[0],examIdentify)==False:
             tableOfListExams.insertEightValues(values,valueName)
-            sendNotify(f"新題目〈{examName}〉發布了！\n發布於<{published_at}>")
+            sendNotify(f"\n新題目〈{examName}〉發布了！\n題庫名稱：{lessonName}\n發布於<{published_at}>")
 def sendNotify(message):
     LINE_TOKEN = os.environ.get("LINE_TOKEN")
     headers = {
