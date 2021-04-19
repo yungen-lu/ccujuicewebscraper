@@ -30,7 +30,7 @@ class newConnection:
         self.cursor.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{tableName}');")
         re = self.cursor.fetchone()[0]
         if re == True:
-            print(f"{tableName} table exists")
+            # print(f"{tableName} table exists")
             return True
         elif re == False:
             print(f"{tableName} table does not exists")
@@ -54,7 +54,7 @@ class newTable(newConnection):
         self.cursor.execute(f"SELECT EXISTS (SELECT FROM information_schema.column WHERE table_schema = 'public' AND table_name = '{self.tableName}' AND column_name = '{columnName}');")
         re = self.cursor.fetchone()[0]
         if re == True:
-            print(f"{self.tableName} exist")
+            # print(f"{self.tableName} exist")
             return True
         elif re == False:
             print(f"{self.tableName} does not exist")
@@ -65,7 +65,7 @@ class newTable(newConnection):
         self.cursor.execute(f"SELECT EXISTS (SELECT FROM \"{self.tableName}\" WHERE {columnID} = '{rowID}');")
         re = self.cursor.fetchone()[0]
         if re == True:
-            print(f"{self.tableName} exist")
+            # print(f"{self.tableName} exist")
             return True
         elif re == False:
             print(f"{self.tableName} does not exist")
