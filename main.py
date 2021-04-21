@@ -57,7 +57,7 @@ class newTable(newConnection):
             # print(f"{self.tableName} exist")
             return True
         elif re == False:
-            print(f"{self.tableName} does not exist")
+            print(f"{columnName} column does not exist")
             return False
         else: sys.exit()
     
@@ -68,7 +68,7 @@ class newTable(newConnection):
             # print(f"{self.tableName} exist")
             return True
         elif re == False:
-            print(f"{self.tableName} does not exist")
+            print(f"{rowID} does not exist")
             return False
         else: sys.exit()
 
@@ -206,8 +206,12 @@ def ValuesToDB(connectionObj,arrayOfExams,parentTableName,lessonIdentify,lessonN
         examIdentify  = obj["identify"]
         examName = obj["name"]
         difficulty = obj["difficulty"]
-        passers = obj["statistic"]["passers"]
-        participants = obj["statistic"]["participants"]
+        if obj["statistic"] != None:
+            passers = obj["statistic"]["passers"]
+            participants = obj["statistic"]["participants"]
+        else:
+            passers = 0
+            participants = 0
         published_at = obj["published_at"]
 
         dtobj = datetime.datetime.strptime(published_at,'%Y-%m-%d %H:%M:%S')
