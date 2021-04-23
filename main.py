@@ -5,7 +5,7 @@ import requests
 import datetime
 from dotenv import load_dotenv
 from fake_useragent import UserAgent
-
+from fake_useragent import FakeUserAgentError
 class newConnection:
     def __init__(self,conn_string):
         self.conn_string = conn_string
@@ -242,8 +242,10 @@ sslmode = 'allow'
 conn_string = "host={0} user={1} dbname={2} password={3} sslmode={4}".format(host, user, dbname, password, sslmode)
 
 connectToDB = newConnection(conn_string)
-
-ua = UserAgent()
+try:
+    ua = UserAgent()
+except FakeUserAgentError:
+    pass
 
 BASE_URL = 'https://ccu.juice.codes'
 BASE_HEADER = {'accept':'application/json','origin':'https://ccu.juice.codes', 'content-type':'application/json','user-agent':ua.random}
